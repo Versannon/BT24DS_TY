@@ -1,44 +1,85 @@
-https://freenewsapi.io/ 
-API Key: cc68cd3b16f471a5c5c22c745d3dbbaea8d484ca43637c790c4e671b631ea0b4
+# 🌐 Free & Real-Time APIs for Streaming & ETL
 
-# Weather & Environment APIs (Live / Real-Time)
-Open-Meteo (Free real-time weather & forecast, no key required): https://open-meteo.com/
-OpenWeatherMap API (Free tier live weather data): https://openweathermap.org/api
-WeatherAPI (Free tier real-time weather & geolocation): https://www.weatherapi.com/
-National Weather Service API (US Govt live weather & alerts, no key): https://www.weather.gov/documentation/services-web-api
-IQAir / AirVisual API (Real-time global air quality & pollution data): https://www.iqair.com/air-quality-api
-World Air Quality Index (WAQI / AQICN) API: https://aqicn.org/api/
+A curated collection of free, live, and real-time public APIs categorized for data engineering, streaming pipeline (Apache Kafka), and ETL experiments.
 
-# Cryptocurrency & Financial Market APIs (Real-Time Streams / WebSockets / REST)
-Binance Public Spot API & WebSockets (Live trades, orderbook & tickers, no key): https://binance-docs.github.io/apidocs/spot/en/
-CoinGecko API (Free tier live crypto price & market data): https://www.coingecko.com/en/api
-CoinCap API (Real-time crypto prices & WebSockets, no key): https://coincap.io/
-Coinbase Cloud Digital Currency API (Public market tickers & WebSockets): https://docs.cloud.coinbase.com/
-CoinPaprika API (Free real-time crypto coins & market tickers): https://coinpaprika.com/api/
-Kraken Public REST & WebSocket API (Live market tickers & trades, no key): https://docs.kraken.com/rest/
-CoinDesk Current Bitcoin Price Index API (Real-time BTC rate, no key): https://api.coindesk.com/v1/bpi/currentprice.json
-Alpha Vantage (Free tier real-time & intraday stock/forex/crypto API): https://www.alphavantage.co/
-Financial Modeling Prep (Free tier live stock market API): https://site.financialmodelingprep.com/developer/docs/
+---
 
-# Natural Disasters, Astronomy & Space Data APIs (Real-Time)
-USGS Earthquake Hazards Program API (Real-time live earthquake GeoJSON feeds, no key): https://earthquake.usgs.gov/fdsnws/event/1/
-NASA Open APIs (Near Earth Objects live tracking, EONET natural event tracker): https://api.nasa.gov/
-Open Notify ISS Location API (Real-time International Space Station position, no key): http://open-notify.org/Open-Notify-API/ISS-Location-Now/
-GDACS Global Disaster Alert & Coordination System API: https://www.gdacs.org/xml/rss.xml
+## 🔑 Active Credentials
 
-# Transportation, Aviation & Transit APIs (Real-Time)
-OpenSky Network API (Real-time global flight tracking & ADS-B aircraft positions, free public access): https://opensky-network.org/apidoc/
-Transport for London (TfL) Unified API (Live bus/tube status & arrivals): https://api.tfl.gov.uk/
-Transitland API (Open GTFS real-time transit feeds): https://www.transit.land/
+> [!IMPORTANT]
+> **FreeNewsAPI Credentials**
+> - **Provider**: [FreeNewsAPI.io](https://freenewsapi.io/)
+> - **API Key**: `cc68cd3b16f471a5c5c22c745d3dbbaea8d484ca43637c790c4e671b631ea0b4`
+> - **Environment Variable**: `news_api`
 
-# News, Media & Event Stream APIs
-NewsAPI.org (Free tier for live breaking news headlines & articles): https://newsapi.org/
-MediaStack API (Free tier live news data API): https://mediastack.com/
-GNews API (Free tier real-time news search & topic stream): https://gnews.io/
-Currents News API (Free tier live news feeds): https://currentsapi.services/
+---
 
-# Real-Time Event Streams & Web Data Services
-Wikimedia EventStreams (Real-time Server-Sent Events / SSE stream of live Wikipedia edits, no key): https://stream.wikimedia.org/v2/ui/
-GitHub Events API (Real-time stream of public GitHub repository activities & events, no key): https://api.github.com/events
-IPify (Simple public IP address lookup API, no key): https://www.ipify.org/
-Public APIs Repository Index: https://github.com/public-apis/public-apis
+## ⛅ Weather & Environment APIs (Live / Real-Time)
+
+| Service | Description | Authentication | Documentation / Link |
+| :--- | :--- | :---: | :--- |
+| **Open-Meteo** | Free real-time weather & forecast data | `No Key Required` | [open-meteo.com](https://open-meteo.com/) |
+| **OpenWeatherMap** | Free tier live weather data | `Free Key` | [openweathermap.org](https://openweathermap.org/api) |
+| **WeatherAPI** | Free tier real-time weather & geolocation | `Free Key` | [weatherapi.com](https://www.weatherapi.com/) |
+| **National Weather Service** | US Govt live weather & alerts | `No Key Required` | [weather.gov](https://www.weather.gov/documentation/services-web-api) |
+| **IQAir / AirVisual** | Real-time global air quality & pollution data | `Free Key` | [iqair.com](https://www.iqair.com/air-quality-api) |
+| **World Air Quality Index** | Real-time global air quality index (WAQI / AQICN) | `Free Key` | [aqicn.org](https://aqicn.org/api/) |
+
+---
+
+## 🪙 Cryptocurrency & Financial Market APIs
+
+| Service | Description | Protocol / Auth | Documentation / Link |
+| :--- | :--- | :---: | :--- |
+| **Binance Public Spot** | Live trades, orderbook & tickers | `REST / WebSocket` (`No Key`) | [binance-docs.github.io](https://binance-docs.github.io/apidocs/spot/en/) |
+| **CoinGecko** | Live crypto prices & market data | `REST` (`Free Key`) | [coingecko.com](https://www.coingecko.com/en/api) |
+| **CoinCap** | Real-time crypto prices & WebSockets | `REST / WebSocket` (`No Key`) | [coincap.io](https://coincap.io/) |
+| **Coinbase Cloud** | Public market tickers & WebSockets | `REST / WebSocket` (`No Key`) | [docs.cloud.coinbase.com](https://docs.cloud.coinbase.com/) |
+| **CoinPaprika** | Real-time crypto coins & market tickers | `REST` (`Free Key`) | [coinpaprika.com](https://coinpaprika.com/api/) |
+| **Kraken Public API** | Live market tickers & trades | `REST / WebSocket` (`No Key`) | [docs.kraken.com](https://docs.kraken.com/rest/) |
+| **CoinDesk BTC Index** | Real-time Bitcoin Price Index (BPI) | `REST` (`No Key`) | [api.coindesk.com](https://api.coindesk.com/v1/bpi/currentprice.json) |
+| **Alpha Vantage** | Real-time & intraday stock/forex/crypto | `REST` (`Free Key`) | [alphavantage.co](https://www.alphavantage.co/) |
+| **Financial Modeling Prep** | Live stock market API | `REST` (`Free Key`) | [financialmodelingprep.com](https://site.financialmodelingprep.com/developer/docs/) |
+
+---
+
+## 🌋 Natural Disasters, Astronomy & Space Data APIs
+
+| Service | Description | Authentication | Documentation / Link |
+| :--- | :--- | :---: | :--- |
+| **USGS Earthquake Hazards** | Real-time live earthquake GeoJSON feeds | `No Key Required` | [earthquake.usgs.gov](https://earthquake.usgs.gov/fdsnws/event/1/) |
+| **NASA Open APIs** | Near-Earth Objects live tracking & EONET event tracker | `Free Key` | [api.nasa.gov](https://api.nasa.gov/) |
+| **Open Notify ISS** | Real-time International Space Station position tracker | `No Key Required` | [open-notify.org](http://open-notify.org/Open-Notify-API/ISS-Location-Now/) |
+| **GDACS** | Global Disaster Alert & Coordination System RSS/XML feeds | `No Key Required` | [gdacs.org](https://www.gdacs.org/xml/rss.xml) |
+
+---
+
+## ✈️ Transportation, Aviation & Transit APIs
+
+| Service | Description | Authentication | Documentation / Link |
+| :--- | :--- | :---: | :--- |
+| **OpenSky Network** | Real-time global flight tracking & ADS-B aircraft positions | `Public Access` | [opensky-network.org](https://opensky-network.org/apidoc/) |
+| **Transport for London (TfL)** | Live bus, tube status & arrival feeds | `Free Key` | [api.tfl.gov.uk](https://api.tfl.gov.uk/) |
+| **Transitland** | Open GTFS real-time transit feeds | `Free Key` | [transit.land](https://www.transit.land/) |
+
+---
+
+## 📰 News, Media & Event Stream APIs
+
+| Service | Description | Authentication | Documentation / Link |
+| :--- | :--- | :---: | :--- |
+| **NewsAPI.org** | Live breaking news headlines & articles | `Free Key` | [newsapi.org](https://newsapi.org/) |
+| **MediaStack** | Live news data API | `Free Key` | [mediastack.com](https://mediastack.com/) |
+| **GNews** | Real-time news search & topic streams | `Free Key` | [gnews.io](https://gnews.io/) |
+| **Currents News** | Real-time live news feeds | `Free Key` | [currentsapi.services](https://currentsapi.services/) |
+
+---
+
+## ⚡ Real-Time Event Streams & Web Services
+
+| Service | Description | Protocol / Auth | Documentation / Link |
+| :--- | :--- | :---: | :--- |
+| **Wikimedia EventStreams** | Real-time Server-Sent Events (SSE) of live Wikipedia edits | `SSE` (`No Key`) | [stream.wikimedia.org](https://stream.wikimedia.org/v2/ui/) |
+| **GitHub Events API** | Real-time public GitHub activity event stream | `REST` (`No Key`) | [api.github.com](https://api.github.com/events) |
+| **IPify** | Simple public IP address lookup API | `REST` (`No Key`) | [ipify.org](https://www.ipify.org/) |
+| **Public APIs Index** | Comprehensive community index of public APIs | `Index` | [github.com/public-apis](https://github.com/public-apis/public-apis) |
