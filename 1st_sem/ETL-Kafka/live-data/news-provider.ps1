@@ -1,63 +1,40 @@
-# ==========================================
-# FreeNewsApi -> Apache Kafka Producer
-# ==========================================
+# ==============================================================================
+# Kafka News Producer (Compact Terminal Feed)
+# ==============================================================================
 
 $KafkaContainer = "kafka"
-$KafkaTopic = "global-news"
-
-# API key is stored safely as a Windows environment variable
-$ApiKey = $env:news_api
+$KafkaTopic     = "global-news"
+$ApiKey         = $env:news_api
 
 if (-not $ApiKey) {
-    Write-Host "ERROR: news_api environment variable not found."
-    exit
+    Write-Host "ERROR: 'news_api' environment variable not set." -ForegroundColor Red
+    exit 1
 }
 
-$headers = @{
-    "x-api-key" = $ApiKey
-}
+$headers = @{ "x-api-key" = $ApiKey }
+$url     = "https://api.freenewsapi.io/v1/news?language=en&topic=world&order_by=recent"
 
-$url = "https://api.freenewsapi.io/v1/news?language=en&topic=world&order_by=recent"
+$SeenArticles  = @{}
+$TotalSent     = 0
 
-# Remember articles already sent during this session
-$SeenArticles = @{}
-
-Write-Host ""
-Write-Host "======================================="
-Write-Host "   LIVE GLOBAL NEWS -> APACHE KAFKA"
-Write-Host "======================================="
-Write-Host ""
-Write-Host "Kafka topic : $KafkaTopic"
-Write-Host "Refresh     : 60 seconds"
-Write-Host ""
-Write-Host "Press Ctrl+C to stop."
+Clear-Host
+Write-Host "=== KAFKA PRODUCER: FreeNewsAPI -> '$KafkaTopic' (60s loop) ===" -ForegroundColor Cyan
 Write-Host ""
 
 while ($true) {
-
     try {
-
-        Write-Host "Fetching latest world news..."
-
-        $response = Invoke-RestMethod `
-            -Uri $url `
-            -Headers $headers `
-            -Method Get
+        $timestamp = (Get-Date).ToString("HH:mm:ss")
+        $response  = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
+        $newCount  = 0
 
         foreach ($article in $response.data) {
-
-            # Prefer UUID for deduplication
             $id = $article.uuid
-
-            if (-not $id) {
-                $id = $article.url
-            }
-
-            if ($SeenArticles.ContainsKey($id)) {
-                continue
-            }
+            if (-not $id) { $id = $article.url }
+            if (-not $id -or $SeenArticles.ContainsKey($id)) { continue }
 
             $SeenArticles[$id] = $true
+            $TotalSent++
+            $newCount++
 
             $message = @{
                 uuid         = $article.uuid
@@ -68,32 +45,23 @@ while ($true) {
             }
 
             $json = $message | ConvertTo-Json -Compress
+            $json | docker exec -i $KafkaContainer /opt/kafka/bin/kafka-console-producer.sh --topic $KafkaTopic --bootstrap-server localhost:9092 2>$null
 
-            # Send JSON to Kafka
-            $json |
-                docker exec -i $KafkaContainer `
-                /opt/kafka/bin/kafka-console-producer.sh `
-                --topic $KafkaTopic `
-                --bootstrap-server localhost:9092
+            $publisher = if ($article.publisher) { $article.publisher } else { "Unknown" }
+            $title     = if ($article.title.Length -gt 75) { $article.title.Substring(0, 72) + "..." } else { $article.title }
 
-            Write-Host ""
-            Write-Host "Published:"
-            Write-Host $article.title
-            Write-Host "Publisher: $($article.publisher)"
+            Write-Host "[$timestamp] " -NoNewline -ForegroundColor DarkGray
+            Write-Host "[PUB #$TotalSent] " -NoNewline -ForegroundColor Green
+            Write-Host "$title " -NoNewline -ForegroundColor White
+            Write-Host "($publisher)" -ForegroundColor Yellow
         }
 
-        Write-Host ""
-        Write-Host "Waiting 60 seconds..."
-        Write-Host ""
-
+        if ($newCount -eq 0) {
+            Write-Host "[$timestamp] [IDLE] No new articles (Session Total: $TotalSent)" -ForegroundColor DarkGray
+        }
     }
     catch {
-
-        Write-Host ""
-        Write-Host "ERROR:"
-        Write-Host $_.Exception.Message
-        Write-Host ""
-        Write-Host "Retrying in 60 seconds..."
+        Write-Host "[$((Get-Date).ToString("HH:mm:ss"))] [ERROR] $($_.Exception.Message)" -ForegroundColor Red
     }
 
     Start-Sleep -Seconds 60
