@@ -7,9 +7,7 @@ producer = KafkaProducer(
 
 
 messages = [
-    "Hello Kafka",
-    "This is a Python producer",
-    "Welcome to ETL Lab"
+    "Versannnonnn"
 ]
 
 for message in messages:
