@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open-Meteo Live Weather & Rain Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo-group">
+                <div class="logo-icon">🌤️</div>
+                <div>
+                    <h1 class="brand-title">Meteo Live Forecast</h1>
+                    <p class="brand-subtitle">Open-Meteo API ETL Data Pipeline Monitor</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <span class="status-badge" id="statusBadge">
+                    <span class="pulse-dot"></span> API CONNECTED
+                </span>
+                <button onclick="fetchWeatherData()" class="btn-btn" id="refreshBtn">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Refresh
+                </button>
+                <button onclick="toggleTempUnit()" class="btn-btn btn-secondary" id="unitBtn">
+                    °C / °F
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-wrapper">
+
+        <!-- Contingency Terminal Command Alert Card -->
+        <div class="glass-card contingency-card">
+            <div class="contingency-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.2rem;">💻</span>
+                    <h3 style="font-size: 0.95rem; font-weight: 700; color: #f59e0b;">Terminal Contingency Mode Available</h3>
+                </div>
+                <span style="font-size: 0.75rem; color: #94a3b8;">No browser needed</span>
+            </div>
+            <p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.75rem;">
+                If you prefer running this inside PowerShell CLI without launching localhost web, execute this contingency script:
+            </p>
+            <div class="cmd-box">
+                <code id="cliCmdText">powershell -ExecutionPolicy Bypass -File .\meteo-cli.ps1</code>
+                <button onclick="copyCliCommand()" class="btn-btn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                    📋 Copy Command
+                </button>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero-weather-grid">
+            <!-- Current Weather Main Banner -->
+            <div class="glass-card hero-main-card">
+                <div>
+                    <div class="location-tag">
+                        <span>📍</span>
+                        <span id="locName">New Delhi, India</span>
+                        <span style="color: var(--text-muted); font-weight: 400;" id="locCoords">(28.6139° N, 77.209° E)</span>
+                    </div>
+
+                    <div class="temp-large-container">
+                        <div class="temp-value" id="currentTemp">--</div>
+                        <div class="temp-unit" id="unitLabel">°C</div>
+                        <div class="temp-details">
+                            <div class="weather-condition-title" id="conditionText">Partly Cloudy</div>
+                            <div class="feels-like-text" id="feelsLike">Feels like -- °C</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-meta-footer">
+                    <div class="hero-meta-item">
+                        <span>🕒 Last Updated:</span>
+                        <strong id="updateTime" style="color: var(--text-primary);">--:--:--</strong>
+                    </div>
+                    <div class="hero-meta-item">
+                        <span>🌐 Timezone:</span>
+                        <strong id="timezoneText" style="color: var(--text-primary);">Asia/Kolkata</strong>
+                    </div>
+                    <div class="hero-meta-item">
+                        <span>🏔️ Elevation:</span>
+                        <strong id="elevationText" style="color: var(--text-primary);">216 m</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Metrics Grid -->
+            <div class="metrics-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+                <div class="glass-card metric-tile cyan">
+                    <div class="metric-header">
+                        <span class="metric-label">Relative Humidity</span>
+                        <span class="metric-icon">💧</span>
+                    </div>
+                    <div class="metric-value" id="valHumidity">--%</div>
+                    <div class="metric-sub">Air moisture index</div>
+                </div>
+
+                <div class="glass-card metric-tile blue">
+                    <div class="metric-header">
+                        <span class="metric-label">Wind Speed</span>
+                        <span class="metric-icon">💨</span>
+                    </div>
+                    <div class="metric-value" id="valWind">-- km/h</div>
+                    <div class="metric-sub">Surface wind velocity</div>
+                </div>
+
+                <div class="glass-card metric-tile emerald">
+                    <div class="metric-header">
+                        <span class="metric-label">Current Rain</span>
+                        <span class="metric-icon">🌧️</span>
+                    </div>
+                    <div class="metric-value" id="valRain">-- mm</div>
+                    <div class="metric-sub">Hourly precip rate</div>
+                </div>
+
+                <div class="glass-card metric-tile amber">
+                    <div class="metric-header">
+                        <span class="metric-label">Surface Pressure</span>
+                        <span class="metric-icon">⏲️</span>
+                    </div>
+                    <div class="metric-value" id="valPressure">-- hPa</div>
+                    <div class="metric-sub">Atmospheric pressure</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+            <div class="glass-card">
+                <h3 class="section-title">
+                    <span>📈</span> 24-Hour Temperature & Feels Like Trend
+                </h3>
+                <div class="chart-container">
+                    <canvas id="tempChart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">
+                    <span>🌧️</span> Rain Precipitation & Surface Pressure
+                </h3>
+                <div class="chart-container">
+                    <canvas id="rainChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hourly Scroll Carousel Section -->
+        <div class="hourly-container">
+            <h3 class="section-title">
+                <span>⏱️</span> Next 24 Hours Hourly Forecast
+            </h3>
+            <div class="hourly-scroll-grid" id="hourlyScroll">
+                <div style="color: var(--text-muted); font-size: 0.85rem;">Loading hourly metrics...</div>
+            </div>
+        </div>
+
+        <!-- 7-Day Daily Rain Forecast Section -->
+        <div>
+            <h3 class="section-title">
+                <span>📅</span> 7-Day Rain Sum Forecast
+            </h3>
+            <div class="daily-grid" id="dailyGrid">
+                <div style="color: var(--text-muted); font-size: 0.85rem;">Loading daily rain sum forecast...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        Open-Meteo Weather Data Engine &bull; Localhost Dashboard ETL Visualizer &bull; New Delhi (28.6139, 77.209)
+    </footer>
+
+    <!-- App JavaScript Logic -->
+    <script>
+        const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=28.6139&longitude=77.209&daily=rain_sum&hourly=temperature_2m,wind_speed_10m,relative_humidity_2m,apparent_temperature,rain,surface_pressure&timezone=auto";
+        
+        let weatherRawData = null;
+        let isFahrenheit = false;
+        let tempChartInstance = null;
+        let rainChartInstance = null;
+
+        async function fetchWeatherData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.style.opacity = '0.6';
+            btn.innerText = 'Refreshing...';
+
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                weatherRawData = await res.json();
+                
+                renderDashboard(weatherRawData);
+                document.getElementById('statusBadge').innerHTML = `<span class="pulse-dot"></span> API CONNECTED`;
+                document.getElementById('statusBadge').style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            } catch (err) {
+                console.error("Failed to load weather data:", err);
+                document.getElementById('statusBadge').innerHTML = `⚠️ API ERROR`;
+                document.getElementById('statusBadge').style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                document.getElementById('statusBadge').style.color = '#ef4444';
+            } finally {
+                btn.style.opacity = '1';
+                btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Refresh`;
+            }
+        }
+
+        function cToF(c) {
+            return (c * 9/5) + 32;
+        }
+
+        function formatTemp(cVal) {
+            if (cVal === undefined || cVal === null) return '--';
+            const val = isFahrenheit ? cToF(cVal) : cVal;
+            return val.toFixed(1);
+        }
+
+        function toggleTempUnit() {
+            isFahrenheit = !isFahrenheit;
+            document.getElementById('unitBtn').innerText = isFahrenheit ? 'Switch to °C' : 'Switch to °F';
+            document.getElementById('unitLabel').innerText = isFahrenheit ? '°F' : '°C';
+            if (weatherRawData) renderDashboard(weatherRawData);
+        }
+
+        function renderDashboard(data) {
+            const now = new Date();
+            document.getElementById('updateTime').innerText = now.toLocaleTimeString();
+            document.getElementById('timezoneText').innerText = data.timezone || 'Asia/Kolkata';
+            document.getElementById('elevationText').innerText = `${data.elevation} m`;
+
+            const hourlyTimes = data.hourly.time;
+            const currentIso = now.toISOString().slice(0, 13) + ":00";
+            
+            let idx = hourlyTimes.findIndex(t => t.startsWith(currentIso.slice(0, 13)));
+            if (idx < 0) idx = 0;
+
+            // Current metrics
+            const curTemp = data.hourly.temperature_2m[idx];
+            const curFeels = data.hourly.apparent_temperature[idx];
+            const curHumidity = data.hourly.relative_humidity_2m[idx];
+            const curWind = data.hourly.wind_speed_10m[idx];
+            const curRain = data.hourly.rain[idx];
+            const curPressure = data.hourly.surface_pressure[idx];
+
+            document.getElementById('currentTemp').innerText = formatTemp(curTemp);
+            document.getElementById('feelsLike').innerText = `Feels like ${formatTemp(curFeels)} °${isFahrenheit ? 'F' : 'C'}`;
+            
+            // Condition tag logic
+            let cond = "Clear Sky";
+            if (curRain > 0.5) cond = "Rainy 🌧️";
+            else if (curRain > 0) cond = "Light Rain 🌦️";
+            else if (curHumidity > 80) cond = "Humid / Overcast ☁️";
+            else if (curWind > 15) cond = "Breezy 💨";
+            else cond = "Partly Sunny 🌤️";
+            document.getElementById('conditionText').innerText = cond;
+
+            document.getElementById('valHumidity').innerText = `${curHumidity}%`;
+            document.getElementById('valWind').innerText = `${curWind} km/h`;
+            document.getElementById('valRain').innerText = `${curRain} mm`;
+            document.getElementById('valPressure').innerText = `${curPressure} hPa`;
+
+            // Hourly Scroll
+            renderHourlyScroll(data, idx);
+
+            // Daily Rain Grid
+            renderDailyGrid(data);
+
+            // Render Charts
+            renderCharts(data, idx);
+        }
+
+        function renderHourlyScroll(data, startIdx) {
+            const container = document.getElementById('hourlyScroll');
+            const hoursCount = 24;
+            const sliceEnd = Math.min(startIdx + hoursCount, data.hourly.time.length);
+            
+            let html = '';
+            for (let i = startIdx; i < sliceEnd; i++) {
+                const rawTime = data.hourly.time[i];
+                const dateObj = new Date(rawTime);
+                const timeLabel = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const temp = formatTemp(data.hourly.temperature_2m[i]);
+                const rain = data.hourly.rain[i];
+                const icon = rain > 0 ? '🌧️' : (dateObj.getHours() > 6 && dateObj.getHours() < 19 ? '☀️' : '🌙');
+                const isActive = i === startIdx ? 'active' : '';
+
+                html += `
+                    <div class="hourly-card ${isActive}">
+                        <div class="hourly-time">${timeLabel}</div>
+                        <div class="hourly-icon">${icon}</div>
+                        <div class="hourly-temp">${temp}°</div>
+                        <div class="hourly-rain">${rain > 0 ? rain + ' mm' : 'Dry'}</div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderDailyGrid(data) {
+            const container = document.getElementById('dailyGrid');
+            const dailyTimes = data.daily.time;
+            const dailyRains = data.daily.rain_sum;
+            
+            const maxRain = Math.max(...dailyRains, 5); // scale threshold
+
+            let html = '';
+            for (let i = 0; i < dailyTimes.length; i++) {
+                const dateStr = dailyTimes[i];
+                const dateObj = new Date(dateStr);
+                const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                const rainVal = dailyRains[i];
+                const fillPercent = Math.min((rainVal / maxRain) * 100, 100).toFixed(0);
+
+                html += `
+                    <div class="glass-card daily-card">
+                        <div>
+                            <div class="daily-date">${dateStr}</div>
+                            <div class="daily-dayname">${dayName}</div>
+                        </div>
+                        <div class="daily-rain-val">🌧️ ${rainVal} <span style="font-size:0.75rem;">mm</span></div>
+                        <div>
+                            <div class="rain-progress-bar">
+                                <div class="rain-progress-fill" style="width: ${fillPercent}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderCharts(data, startIdx) {
+            const sliceCount = 24;
+            const endIdx = Math.min(startIdx + sliceCount, data.hourly.time.length);
+            
+            const labels = data.hourly.time.slice(startIdx, endIdx).map(t => {
+                const d = new Date(t);
+                return d.toLocaleTimeString([], { hour: '2-digit' });
+            });
+
+            const temps = data.hourly.temperature_2m.slice(startIdx, endIdx).map(v => isFahrenheit ? cToF(v) : v);
+            const feels = data.hourly.apparent_temperature.slice(startIdx, endIdx).map(v => isFahrenheit ? cToF(v) : v);
+            const rains = data.hourly.rain.slice(startIdx, endIdx);
+            const pressures = data.hourly.surface_pressure.slice(startIdx, endIdx);
+
+            // Temperature Chart
+            const ctx1 = document.getElementById('tempChart').getContext('2d');
+            if (tempChartInstance) tempChartInstance.destroy();
+
+            const gradient1 = ctx1.createLinearGradient(0, 0, 0, 250);
+            gradient1.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+            gradient1.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+            tempChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: `Temperature (°${isFahrenheit ? 'F' : 'C'})`,
+                            data: temps,
+                            borderColor: '#38bdf8',
+                            backgroundColor: gradient1,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: `Feels Like (°${isFahrenheit ? 'F' : 'C'})`,
+                            data: feels,
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            borderDash: [4, 4],
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }
+                    }
+                }
+            });
+
+            // Rain & Pressure Chart
+            const ctx2 = document.getElementById('rainChart').getContext('2d');
+            if (rainChartInstance) rainChartInstance.destroy();
+
+            rainChartInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Rain (mm)',
+                            data: rains,
+                            backgroundColor: 'rgba(168, 85, 247, 0.7)',
+                            borderRadius: 6,
+                            yAxisID: 'yRain'
+                        },
+                        {
+                            label: 'Pressure (hPa)',
+                            data: pressures,
+                            type: 'line',
+                            borderColor: '#f59e0b',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'yPress'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+                        yRain: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: 'Rain (mm)', color: '#a855f7' },
+                            ticks: { color: '#64748b' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        yPress: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'Pressure (hPa)', color: '#f59e0b' },
+                            ticks: { color: '#64748b' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function copyCliCommand() {
+            const cmd = document.getElementById('cliCmdText').innerText;
+            navigator.clipboard.writeText(cmd);
+            alert('PowerShell Contingency Command copied to clipboard!\n\n' + cmd);
+        }
+
+        // Initialize on load
+        fetchWeatherData();
+    </script>
+</body>
+</html>

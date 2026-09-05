@@ -1,1 +1,0 @@
-Hello, Hi to Apache Kafka From Soham.
